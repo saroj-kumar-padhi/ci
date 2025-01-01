@@ -1,0 +1,38 @@
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+  push:
+    branches:
+      - main
+      - master
+      - develop
+name: "Build Android on Windows"
+
+jobs:
+  android-build:
+    name: Build Android APK
+    runs-on: windows-latest
+    steps:
+      # Step 1: Check out the repository
+      - uses: actions/checkout@v3
+
+      # Step 2: Set up Flutter for Windows
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          architecture: x64
+
+      # Step 3: Verify Flutter installation
+      - run: flutter doctor
+
+      # Step 4: Build Android APK
+      - run: flutter build apk --release --split-per-abi
+
+      # Step 5: Upload the build output as an artifact
+      - name: Upload Android Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-apk
+          path: build/app/outputs/apk/release/
